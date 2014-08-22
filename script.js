@@ -45,7 +45,7 @@ function managePlayerList(list)
 	$(".other").empty();
 	while(list[i] != undefined)
 	{
-		$(".other").append("<h2>"+list[i]+"</h2>");
+		$(".other").append("<h2>"+list[i]['login']+"</h2>");
 		i++;
 	}
 }
