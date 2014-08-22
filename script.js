@@ -1,7 +1,39 @@
+const INIT = 1;
+
 var socket;
 var login;
+var status;
 
 function displayRoom()
+{
+	if (status === undefined)
+	{
+		status = INIT;
+		$('').hide();
+		$('').show();
+		$('').hide();// hide startbutton
+	}
+}
+
+function displayStartButton()
+{
+	$('').show();
+}
+
+function displayGame(word)
+{
+	alert(word);
+	$('').hide();
+	$('').show();
+}
+
+function displayGameAdmin()
+{
+	$('').hide();
+	$('').show();
+}
+
+function displayFinish()
 {
 	$('').hide();
 	$('').show();
@@ -34,13 +66,15 @@ function sendKey(info)
 
 $(document).ready(function()
 {
+	displayRoom();
 	socket = io('192.168.1.93:8888');
 	//socket = io('localhost:8888');
+	socket.on("playerList", managePlayerList);
+	socket.on("firstPlayer", displayStartButton);
+	socket.on("secretWord", displayGame);
 	login = prompt('What is your nickname ? :)');
 	socket.emit("login", login);
 
-	socket.on("playerList", managePlayerList);
-	socket.on("firstPlayer", chooseWord);
 
 	$('body').on('keydown', sendKey);
 });
