@@ -14,7 +14,7 @@ function managePlayerList(list)
 
 function chooseWord()
 {
-	var word;
+	var word = "";
 	while (word.length < 4)
 		word = prompt("Choose your destiny !\n...\nAnd a word to find.");
 	socket.emit("word", word);
