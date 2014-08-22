@@ -1,0 +1,1 @@
+var socket = io('localhost:8888');
