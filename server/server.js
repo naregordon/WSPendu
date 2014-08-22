@@ -9,16 +9,19 @@ function generateList()
 	while (playerList[i] != undefined)
 	{
 		if (playerList[i]['out'] !== true && playerList[i]['login'] != undefined)
-			tab.push(playerList[i]);
+			tab.push(playerList[i]['login']);
 		i++;
 	}
 	return tab;
 }
 
+var word;
+var letters;
 io.on('connection', function(socket)
 {
 	var player = {};
 	player.key = socket.id;
+	player.socket = socket;
 	playerList.push(player);
 	console.log("new");
 
@@ -30,12 +33,12 @@ io.on('connection', function(socket)
 		io.emit("playerList", generateList());
 		console.log(playerList);
 	});
-
-
-	playerList[0].socket.emit('firstPlayer');
 	
 	socket.on('word', function(word){
-		var letters = word.length;
+		letters = word.length;
+		word = word;
+		var secretWord = '_'*letters;
+		io.emit("secretWord", secretWord);
 	});
 
 	socket.on('disconnect', function() {
