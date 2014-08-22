@@ -18,3 +18,36 @@ h1 {
 	border: 1px solid black;
 }
 
+.mainplayer {
+	height: 200px;
+	width: 90%;
+	margin: 0 auto;
+}
+
+.img {
+	width: 20%;
+	border: 1px solid black;
+	height: 200px;
+	float: left;
+}
+
+.mot {
+	width: 50%;
+	border: 1px solid black;
+	height: 200px;
+	float: left;
+}
+
+.lettres {
+	width: 20%;
+	border: 1px solid black;
+	height: 200px;
+	float: left;
+}
+
+.pts {
+	width: 9%;
+	border: 1px solid black;
+	height: 200px;
+	float: left;
+}
