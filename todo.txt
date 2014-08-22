@@ -1,0 +1,14 @@
+Client :
+prompt
+envoie login au server => ("login", login)
+recuperation de la liste des utilisateurs => ("list", array)
++ bonus si on est le premier a se connecter choisir un mot => ("choose")
++ bonus envoie du mot => ("choose", mot)
+- bonus partie en cours attendre fin de partie en cours, afficher les scores => ("status", array)
+
+envoie touche => ("key", touche)
+recup statut soit meme => ("perso", joueur)
+recup statut joueur => ("info", joueur)
+
+
+Server :
