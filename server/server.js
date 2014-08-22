@@ -23,7 +23,7 @@ function generateList()
 	return tab;
 }
 
-var word;
+var currentWord;
 var letters;
 io.on('connection', function(socket)
 {
@@ -43,9 +43,16 @@ io.on('connection', function(socket)
 	});
 	
 	socket.on('word', function(word){
+		player.secretWord = word;
 		letters = word.length;
-		word = word;
-		var secretWord = '_'*letters;
+		currentWord = word;
+		var secretWord = "";
+		var i = 0;
+		while (i < letters)
+		{
+			secretWord += "_";
+			i++;
+		}
 		io.emit("secretWord", secretWord);
 	});
 
