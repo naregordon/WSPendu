@@ -32,6 +32,11 @@ io.on('connection', function(socket)
 	});
 
 
+	playerList[0].socket.emit('firstPlayer');
+	
+	socket.on('word', function(word){
+		var letters = word.length;
+	});
 
 	socket.on('disconnect', function() {
 		player.out = true;
