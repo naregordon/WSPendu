@@ -80,9 +80,22 @@ io.on('connection', function(socket)
 		});
 		socket.on('key', function(key)
 		{
-			console.log("Mot a trouver: "+currentWord);
-			console.log("Mot en cours: "+player.word);
-			console.log("Lettre appuye: "+key);
+			if(currentWord.toLowerCase().indexOf(key.toLowerCase()) >= 0) {
+				var posChar = currentWord.toLowerCase().indexOf(key.toLowerCase());
+				var changCharC = currentWord.charAt(posChar);			
+				var changCharW = player.word.charAt(posChar);
+				player.word = player.word.replace(changCharW, changCharC);
+
+				console.log('changCharW : '+changCharW);
+				console.log('changCharC : '+changCharC);
+				console.log("position de la lettre :"+posChar);
+				console.log("Mot a trouver: "+currentWord);
+				console.log("Lettre appuye: "+key);
+				console.log("Mot en cours: "+player.word);
+				console.log('la lettre existe');
+			}
+			else
+				console.log('la lettre n\'existe pas');
 		});
 	});
 	socket.on('disconnect', function()
