@@ -28,7 +28,7 @@ function sendKey(info)
 
 $(document).ready(function()
 {
-	socket = io('192.168.1.93:8888');
+	socket = io('localhost:8888');
 	login = prompt('What is your nickname ? :)');
 	socket.emit("login", login);
 
