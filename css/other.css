@@ -1,0 +1,22 @@
+html,body {
+	margin: 0;
+	padding: 0;
+}
+
+h1 {
+	text-align: center;
+	background-color: red;
+	margin: 0;
+	padding: 10px;
+}
+
+.game {
+	border: 1px solid black;
+}
+
+.other {
+	border: 1px solid black;
+}
+
+
+
