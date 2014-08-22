@@ -3,6 +3,7 @@
 <head>
 	<meta charset="UTF-8">
 	<title>Pendu Node.js</title>
+	<link rel="stylesheet" type="text/css" href="../css/screen.css">
 	<link rel="stylesheet" type="text/css" href="../css/other.css">
 	<script src="socket.io.js"></script>
 	<script src="jquery.js"></script>
@@ -10,29 +11,39 @@
 </head>
 <body>
 	<h1>Pendu Node.js</h1>
+	<p id="user"></p>
 	<div class="content">
-		<!-- 
 		<div class="game">
 			<div class="mainplayer">
 				<div class="img">
+					image
 				</div>
 				<div class="mot">
+					mot
 				</div>
 				<div class="lettres">
+					lettres utilisés
 				</div>
 				<div class="pts">
-				</div>
-			</div>
-			-->
-			<div id="other">
-				<div id="other-image" class="othimg">
-					
+					pts
 				</div>
 			</div>
 		</div>
-
-	</div>
-
-
-</body>
+		<div class="other">
+			<div class="joueur">
+				<table class="other-detail-joueur">
+					<tbody>
+						<tr>
+							<td class="other-img">img</td>
+							<td class="other-mot"> _ _ _ # #_ _ # </td>
+							<td class="other-lettres">26</td>
+							<td class="other-pts">
+								3 <sup class="abbrev">Pts</sup>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</body>
 </html>

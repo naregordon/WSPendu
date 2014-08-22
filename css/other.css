@@ -16,7 +16,54 @@ h1 {
 
 .other {
 	border: 1px solid black;
+	position: relative;
 }
 
-
-
+.joueur
+{
+	min-width: 600px;
+	width: 60%;
+	margin: 0 auto;
+}
+.other-detail-joueur
+{
+	display: block;
+	max-width: 600px;
+	border: none;
+}
+.other-img
+{
+	height: 64px;
+	min-width: 64px;
+	text-align: center;
+}
+.other-mot
+{
+    color: #0000C0;
+    font-size: 16pt;
+    height: 64px;
+    max-width: 408px;
+    text-align: center;
+    text-shadow: 2px 2px 2px rgba(0, 0, 0, 0.8);
+    width: 100%;
+}
+.other-lettres
+{
+	color: #FF4500;
+	font-size: 18pt;
+	height: 64px;
+	min-width: 64px;
+	text-align: center;
+}
+.other-pts
+{
+	color: #FF4500;
+	font-size: 18pt;
+	height: 64px;
+	min-width: 64px;
+	text-align: center;
+}
+.abbrev
+{
+	font-size: 8pt;
+}
