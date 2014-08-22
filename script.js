@@ -4,6 +4,12 @@ var socket;
 var login;
 var status;
 
+function manageSelfLogin(truelogin)
+{
+	login = truelogin;
+	$('#self').html("Bonjour "+login);
+}
+
 function displayRoom()
 {
 	if (status === undefined)
@@ -17,14 +23,19 @@ function displayRoom()
 
 function displayStartButton()
 {
-	$('').show();
+	$('#button').show();
+	$('#button').on('click', function()
+	{
+		chooseWord();
+	});
 }
 
 function displayGame(word)
 {
-	alert(word);
-	$('').hide();
-	$('').show();
+	$('#word').html(word);
+	$('body').off('keydown').on('keydown', sendKey);
+	//$('').hide();
+	//$('').show();
 }
 
 function displayGameAdmin()
@@ -42,10 +53,13 @@ function displayFinish()
 function managePlayerList(list)
 {
 	var i = 0;
-	$(".other").empty();
+	$("#list").empty();
 	while(list[i] != undefined)
 	{
-		$(".other").append("<h2>"+list[i]['login']+"</h2>");
+		if (list[i].admin == true)
+			$("#list").append('<h2 style="background-color:red;">'+list[i]['login']+"</h2>");
+		else
+			$("#list").append("<h2>"+list[i]['login']+"</h2>");
 		i++;
 	}
 }
@@ -60,23 +74,23 @@ function chooseWord()
 
 function sendKey(info)
 {
-	if (info.keyCode > 64 && info.keyCode < 90)
-		socket.emit("", String.fromCharCode(info.keyCode));
+	if (info.keyCode > 64 && info.keyCode < 91)
+		socket.emit("key", String.fromCharCode(info.keyCode));
 }
 
 $(document).ready(function()
 {
 	socket = io('localhost:8888');
 	displayRoom();
-	socket = io('192.168.1.93:8888');
-	//socket = io('localhost:8888');
+	//socket = io('192.168.1.93:8888');
+	socket = io('localhost:8888');
 	socket.on("playerList", managePlayerList);
-	socket.on("firstPlayer", displayStartButton);
-	socket.on("secretWord", displayGame);
+	socket.on("login", manageSelfLogin);
+	socket.on("admin", displayStartButton);
+	socket.on("start", displayGame);
 	login = prompt('What is your nickname ? :)');
 	socket.emit("login", login);
 
 
-	$('body').on('keydown', sendKey);
 });
 

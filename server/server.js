@@ -1,6 +1,6 @@
 var io = require('socket.io').listen(8888);
-
 var playerList = new Array();
+var currentWord;
 
 function generateList()
 {
@@ -9,57 +9,87 @@ function generateList()
 	while (playerList[i] != undefined)
 	{
 		if (playerList[i]['out'] !== true && playerList[i]['login'] != undefined)
-		{
-			var user = {};
-			user.login = playerList[i]['login'];
-			user.score = 0;
-			if (i == 0) {
-				user.admin = true;
-			}
-			tab.push(user);
-		}
+			tab.push(generatePlayer(playerList[i]));
 		i++;
 	}
 	return tab;
 }
 
-var currentWord;
-var letters;
+function generatePlayer(data)
+{
+	var tab = {};
+	tab.login = data['login'];
+	tab.score = data['score'];
+	tab.admin = data['admin'];
+	tab.word = data['word'];// _ A _ B _ U
+	tab.publicWord = "";// _ X _ X _ X
+	tab.used = data['used'];
+	tab.publicUsed = data['used'].length;
+	tab.image = data['image'];
+	return tab;
+}
+
+function refreshPlayer(id)
+{
+	io.emit("status", generatePlayer(playerList[id]));
+}
+
 io.on('connection', function(socket)
 {
-	var player = {};
-	player.key = socket.id;
-	player.socket = socket;
 	console.log("new");
+
+	var player = {};
+	player.socket = socket;
+	player.score = 0;
+	player.admin = false;
+	player.used = [];
+
 
 	socket.on('login', function(login)
 	{
-		playerList.push(player);
 		player.login = login;
-		console.log("bonjour "+login);
-		socket.emit("new_user", login);
-		io.emit("playerList", generateList());
-		console.log(playerList);
-	});
-	
-	socket.on('word', function(word){
-		player.secretWord = word;
-		letters = word.length;
-		currentWord = word;
-		var secretWord = "";
-		var i = 0;
-		while (i < letters)
+		if (playerList.length == 0)
 		{
-			secretWord += "_";
-			i++;
+			player.admin = true;
+			socket.emit('admin');
 		}
-		io.emit("secretWord", secretWord);
-	});
+		playerList.push(player);
 
-	socket.on('disconnect', function() {
+		socket.emit("login", login);
+		/*
+			
+		*/
+		io.emit("playerList", generateList());
+	
+		socket.on('word', function(word)
+		{
+			if (player.admin == true)
+			{
+				currentWord = word;
+				var letters = word.length;
+				var secretWord = "";
+				var i = 0;
+				while (i < letters)
+				{
+					secretWord += "_";
+					i++;
+				}
+				player.word = secretWord;
+				io.emit("start", secretWord);
+			}
+		});
+		socket.on('key', function(key)
+		{
+			console.log("Mot a trouver: "+currentWord);
+			console.log("Mot en cours: "+player.word);
+			console.log("Lettre appuye: "+key);
+		});
+	});
+	socket.on('disconnect', function()
+	{
 		player.out = true;
 		console.log('disconnect event');
-		console.log(playerList);
+		io.emit("playerList", generateList());
 	});
 });
 
