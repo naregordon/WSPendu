@@ -66,6 +66,7 @@ function sendKey(info)
 
 $(document).ready(function()
 {
+	socket = io('localhost:8888');
 	displayRoom();
 	socket = io('192.168.1.93:8888');
 	//socket = io('localhost:8888');

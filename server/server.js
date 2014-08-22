@@ -9,7 +9,15 @@ function generateList()
 	while (playerList[i] != undefined)
 	{
 		if (playerList[i]['out'] !== true && playerList[i]['login'] != undefined)
-			tab.push(playerList[i]['login']);
+		{
+			var user = {};
+			user.login = playerList[i]['login'];
+			user.score = 0;
+			if (i == 0) {
+				user.admin = true;
+			}
+			tab.push(user);
+		}
 		i++;
 	}
 	return tab;
@@ -22,11 +30,11 @@ io.on('connection', function(socket)
 	var player = {};
 	player.key = socket.id;
 	player.socket = socket;
-	playerList.push(player);
 	console.log("new");
 
 	socket.on('login', function(login)
 	{
+		playerList.push(player);
 		player.login = login;
 		console.log("bonjour "+login);
 		socket.emit("new_user", login);
