@@ -19,6 +19,7 @@ io.on('connection', function(socket)
 {
 	var player = {};
 	player.key = socket.id;
+	player.socket = socket;
 	playerList.push(player);
 	console.log("new");
 
@@ -31,11 +32,11 @@ io.on('connection', function(socket)
 		console.log(playerList);
 	});
 
-
 	playerList[0].socket.emit('firstPlayer');
 	
 	socket.on('word', function(word){
 		var letters = word.length;
+
 	});
 
 	socket.on('disconnect', function() {
