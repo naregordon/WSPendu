@@ -27,6 +27,7 @@ function generatePlayer(data)
 	tab.publicUsed = data['used'].length;
 	tab.image = data['image'];
 	tab.falseKey = data['falseKey'];
+	tab.win = data['win'];
 	tab.currentWord = data['currentWord'];
 	return tab;
 }
@@ -44,6 +45,7 @@ io.on('connection', function(socket)
 	player.socket = socket;
 	player.score = 0;
 	player.admin = false;
+	player.win = false;
 	player.used = [];
 	player.falseKey = [];
 
@@ -96,6 +98,10 @@ io.on('connection', function(socket)
 				console.log(key);
 				console.log(curPos);
 				console.log("DEBUG > ", currentWord.charAt(curPos));
+				console.log(currentWord);
+				if (player.word.toLowerCase() === currentWord.toLowerCase()) {
+					player.win = true;
+				}
 			}
 			if (wrong) {
 				player.falseKey.push(key);
