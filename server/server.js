@@ -15,20 +15,20 @@ function generateList()
 	return tab;
 }
 
-function generatePlayer(data)
+function generatePlayer(data, isPublic)
 {
 	var tab = {};
 	tab.login = data['login'];
 	tab.score = data['score'];
 	tab.admin = data['admin'];
 	tab.word = data['word'];// _ A _ B _ U
-	tab.publicWord = "";// _ X _ X _ X
+	tab.publicWord = data['publicWord'];// _ X _ X _ X
 	tab.used = data['used'];
 	tab.publicUsed = data['used'].length;
 	tab.image = data['image'];
 	tab.falseKey = data['falseKey'];
-	tab.win = data['win'];
 	tab.currentWord = data['currentWord'];
+	tab.id = data['id'];
 	return tab;
 }
 
@@ -45,11 +45,12 @@ io.on('connection', function(socket)
 	player.socket = socket;
 	player.score = 0;
 	player.admin = false;
-	player.win = false;
 	player.used = [];
 	player.falseKey = [];
+	player.image = 11;
+	player.id = socket.id;
 
-	socket.on('login', function(login)
+	socket.on('login', function (login, id)
 	{
 		player.login = login;
 		if (playerList.length == 0)
@@ -58,8 +59,7 @@ io.on('connection', function(socket)
 			socket.emit('admin');
 		}
 		playerList.push(player);
-
-		socket.emit("login", login);
+		socket.emit("login", player.login, player.id);
 		/*
 			
 		*/
@@ -78,6 +78,7 @@ io.on('connection', function(socket)
 					secretWord += "_";
 					i++;
 				}
+				player.publicWord = secretWord;
 				player.word = secretWord;
 				io.emit("start", secretWord);
 			}
@@ -92,6 +93,7 @@ io.on('connection', function(socket)
 			{
 				console.log("BEFORE > ", player.word, curPos, pos);
 				player.word = player.word.substr(0, pos)+key+player.word.substr(pos+1);
+				player.publicWord = player.word.substr(0, pos)+'X'+player.word.substr(pos+1);
 				wrong = false;
 				curPos = pos + 1;
 				console.log("AFTER > ", player.word);
@@ -100,13 +102,17 @@ io.on('connection', function(socket)
 				console.log("DEBUG > ", currentWord.charAt(curPos));
 				console.log(currentWord);
 				if (player.word.toLowerCase() === currentWord.toLowerCase()) {
-					player.win = true;
+					io.emit("winner", generatePlayer(player, true));
 				}
 			}
 			if (wrong) {
 				player.falseKey.push(key);
+				player.image--;
+				if(player.image <= 0) {
+					io.emit("loose", player.id);
+				}
 			}
-			socket.emit('updatePlayer', generatePlayer(player));
+			socket.emit('updatePlayer', generatePlayer(player, true));
 		});
 	});
 	socket.on('disconnect', function()
