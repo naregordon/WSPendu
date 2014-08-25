@@ -34,13 +34,30 @@ function displayStartButton()
 
 function update(info)
 {
-	if (info.id != id)
-		var block = $("#other").find('j_'+info.id);
+	console.log(info);
+	if (!info.id)
+		info.id = id;
+	if (!info.word)
+		info.word = '_ _ _ _ _ _';
+	if (!info.used)
+		info.used = 'A B C';
+	if ($('#j_'+info.id).length > 0)
+	{
+		$('.img', $('#j_'+info.id)).attr('src', 'images/pendu.jpg');
+		$('.word', $('#j_'+info.id)).html(info.word);
+		$('.used', $('#j_'+info.id)).html(info.used);
+	}
 	else
-		var block = $("#self");
-	$('.img', block).attr('src', "images/pendu.jpg");// info.img
-	$('.word', block).html("_ _ X _");// info.word
-	$('.used', block).html("3");// info.used
+	{
+		var div = $('<fieldset id="j_'+info.id+'"><legend>'+info.login+'</legend></fieldset>');
+		$(div).append('<img class="img" src="images/pendu.jpg"/>');
+		$(div).append('<div class="word">'+info.word+'</div>');
+		$(div).append('<div class="used">'+info.used+'</div>');
+		if (info.id == id)
+			$('#self').html(div);
+		else
+			$('#other').append(div);
+	}
 }
 
 function displayGame(word)
@@ -51,15 +68,15 @@ function displayGame(word)
 	$('#self').find('.used').empty();
 	$('#self').find('.img').attr('src', "images/pendu.jpg");
 	$('body').off('keydown').on('keydown', sendKey);
-	// Récupérer les informations de tout le monde !
+	var i = 0;
+	while (list[i] != undefined)
+	{
+		update(list[i]);
+		i++;
+	}
 	socket.on("update", update);
 	socket.removeListener('start', displayGame);
-}
-
-function displayGameAdmin()
-{
-	$('').hide();
-	$('').show();
+	socket.removeListener('admin', displayStartButton);
 }
 
 function displayFinish()
@@ -97,11 +114,6 @@ $(document).ready(function()
 	displayRoom();
 	socket.on("playerList", managePlayerList);
 	socket.on("login", manageSelfLogin);
-	socket.on("admin", displayStartButton);
-	socket.on("start", displayGame);
-	socket.on('updatePlayer', function(data){
-		displayGame(data['word']);
-		console.log(data)});
 	login = prompt('What is your nickname ? :)');
 	socket.emit("login", login);
 });
