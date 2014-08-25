@@ -37,6 +37,17 @@ function refreshPlayer(id)
 	io.emit("status", generatePlayer(playerList[id]));
 }
 
+function setWord(newWord)
+{
+	var i = 0;
+	while (playerList[i] != undefined)
+	{
+		playerList[i].word = newWord;
+		playerList[i].publicWord = newWord;
+		i++;
+	}
+}
+
 io.on('connection', function(socket)
 {
 	console.log("new");
@@ -78,8 +89,7 @@ io.on('connection', function(socket)
 					secretWord += "_";
 					i++;
 				}
-				player.publicWord = secretWord;
-				player.word = secretWord;
+				setWord(secretWord);
 				io.emit("start", secretWord);
 			}
 		});
@@ -93,7 +103,7 @@ io.on('connection', function(socket)
 			{
 				console.log("BEFORE > ", player.word, curPos, pos);
 				player.word = player.word.substr(0, pos)+key+player.word.substr(pos+1);
-				player.publicWord = player.word.substr(0, pos)+'X'+player.word.substr(pos+1);
+				player.publicWord = player.publicWord.substr(0, pos)+'X'+player.publicWord.substr(pos+1);
 				wrong = false;
 				curPos = pos + 1;
 				console.log("AFTER > ", player.word);

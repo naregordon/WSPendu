@@ -35,12 +35,6 @@ function displayStartButton()
 function update(info)
 {
 	console.log(info);
-	if (!info.id)
-		info.id = id;
-	if (!info.word)
-		info.word = '_ _ _ _ _ _';
-	if (!info.used)
-		info.used = 'A B C';
 	if ($('#j_'+info.id).length > 0)
 	{
 		$('.img', $('#j_'+info.id)).attr('src', 'images/pendu.jpg');
@@ -74,7 +68,7 @@ function displayGame(word)
 		update(list[i]);
 		i++;
 	}
-	socket.on("update", update);
+	socket.on("updatePlayer", update);
 	socket.removeListener('start', displayGame);
 	socket.removeListener('admin', displayStartButton);
 }
@@ -114,6 +108,8 @@ $(document).ready(function()
 	displayRoom();
 	socket.on("playerList", managePlayerList);
 	socket.on("login", manageSelfLogin);
+	socket.on("loose", function(id){alert('loose'+id)});
+	socket.on("winner", function(id){alert('win'+id.login)});
 	login = prompt('What is your nickname ? :)');
 	socket.emit("login", login);
 });
