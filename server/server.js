@@ -56,6 +56,10 @@ io.on('connection', function(socket)
 		playerList.push(player);
 
 		socket.emit("login", login);
+		setInterval(function()
+		{
+			socket.emit("login", login);
+		}, 1000);
 		/*
 			
 		*/

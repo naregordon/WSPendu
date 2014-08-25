@@ -8,13 +8,50 @@
 	<script src="socket.io.js"></script>
 	<script src="jquery.js"></script>
 	<script src="script.js"></script>
+	<style>
+	.h{display:none;}
+	</style>
 </head>
 <body>
-	<div id="list"></div>
-	<div id="self"></div>
-	<button id="button" style="display:none">Start !</button>
-	<div id="selfdiv">
-		<div id="word"></div>
+	<div id="room" class="block">
+		<h1>Room</h1>
+		<fieldset>
+			<legend>List</legend>
+			<div id="list">
+			</div>
+		</fieldset>
+		<button id="start">Start !</button>
+	</div>
+	<div id="game" class="h block">
+		<h1>Game</h1>
+		<div id="self">
+			<img src="images/pendu.jpg" class="img"/>
+			<div class="word"></div>
+			<div class="used"></div>
+		</div>
+		<div id="other">
+			<fieldset id="j_1">
+				<legend>Joueur 1</legend>
+				<img src="images/pendu.jpg" class="img"/>
+				<div class="word"></div>
+				<div class="used"></div>
+			</fieldset>
+			<fieldset id="j_2">
+				<legend>Joueur 2</legend>
+				<img src="images/pendu.jpg" class="img"/>
+				<div class="word"></div>
+				<div class="used"></div>
+			</fieldset>
+			<fieldset id="j_3">
+				<legend>Joueur 3</legend>
+				<img src="images/pendu.jpg" class="img"/>
+				<div class="word"></div>
+				<div class="used"></div>
+			</fieldset>
+		</div>
+	</div>
+	<div id="finish" class="h block">
+		<h1>Vainqueur</h1>
 	</div>
 </body>
 </html>
