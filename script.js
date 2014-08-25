@@ -88,6 +88,9 @@ $(document).ready(function()
 	socket.on("login", manageSelfLogin);
 	socket.on("admin", displayStartButton);
 	socket.on("start", displayGame);
+	socket.on('updatePlayer', function(data){
+		displayGame(data['word']);
+		console.log(data)});
 	login = prompt('What is your nickname ? :)');
 	socket.emit("login", login);
 
