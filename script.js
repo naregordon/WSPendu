@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 var socket;
 var list;
 var login;
@@ -100,4 +101,3 @@ $(document).ready(function()
 	login = prompt('What is your nickname ? :)');
 	socket.emit("login", login);
 });
-

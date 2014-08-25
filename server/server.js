@@ -26,6 +26,8 @@ function generatePlayer(data)
 	tab.used = data['used'];
 	tab.publicUsed = data['used'].length;
 	tab.image = data['image'];
+	tab.falseKey = data['falseKey'];
+	tab.currentWord = data['currentWord'];
 	return tab;
 }
 
@@ -43,7 +45,7 @@ io.on('connection', function(socket)
 	player.score = 0;
 	player.admin = false;
 	player.used = [];
-
+	player.falseKey = [];
 
 	socket.on('login', function(login)
 	{
@@ -56,10 +58,6 @@ io.on('connection', function(socket)
 		playerList.push(player);
 
 		socket.emit("login", login);
-		setInterval(function()
-		{
-			socket.emit("login", login);
-		}, 1000);
 		/*
 			
 		*/
@@ -84,22 +82,25 @@ io.on('connection', function(socket)
 		});
 		socket.on('key', function(key)
 		{
-			if(currentWord.toLowerCase().indexOf(key.toLowerCase()) >= 0) {
-				var posChar = currentWord.toLowerCase().indexOf(key.toLowerCase());
-				var changCharC = currentWord.charAt(posChar);			
-				var changCharW = player.word.charAt(posChar);
-				player.word = player.word.replace(changCharW, changCharC);
-
-				console.log('changCharW : '+changCharW);
-				console.log('changCharC : '+changCharC);
-				console.log("position de la lettre :"+posChar);
-				console.log("Mot a trouver: "+currentWord);
-				console.log("Lettre appuye: "+key);
-				console.log("Mot en cours: "+player.word);
-				console.log('la lettre existe');
+			player.used.push(key);
+			var curPos = 0;
+			var pos = 0;
+			var wrong = true;
+			while ((pos = currentWord.toLowerCase().indexOf(key.toLowerCase(), curPos)) != -1)
+			{
+				console.log("BEFORE > ", player.word, curPos, pos);
+				player.word = player.word.substr(0, pos)+key+player.word.substr(pos+1);
+				wrong = false;
+				curPos = pos + 1;
+				console.log("AFTER > ", player.word);
+				console.log(key);
+				console.log(curPos);
+				console.log("DEBUG > ", currentWord.charAt(curPos));
 			}
-			else
-				console.log('la lettre n\'existe pas');
+			if (wrong) {
+				player.falseKey.push(key);
+			}
+			socket.emit('updatePlayer', generatePlayer(player));
 		});
 	});
 	socket.on('disconnect', function()
@@ -110,3 +111,4 @@ io.on('connection', function(socket)
 	});
 });
 
+>>>>>>> 66b9404d93c494b67e76a3efb5156853677ed918
