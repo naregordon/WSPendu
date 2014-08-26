@@ -8,8 +8,8 @@ function generateList()
 	var i = 0;
 	while (playerList[i] != undefined)
 	{
-		if (playerList[i]['out'] !== true && playerList[i]['login'] != undefined)
-			tab.push(generatePlayer(playerList[i]));
+		if (playerList[i]['online'] === true && playerList[i]['login'] != undefined)
+			tab.push(generatePlayer(playerList[i], true));
 		i++;
 	}
 	return tab;
@@ -19,7 +19,7 @@ function generatePlayerList(isPublic) {
 	var tab = new Array();
 	var i = 0;
 	while(playerList[i] != undefined) {
-		tab.push(generatePlayer(player[i], isPublic));
+		tab.push(generatePlayer(playerList[i], isPublic));
 		i++;
 	}
 	return tab;
@@ -73,15 +73,20 @@ io.on('connection', function(socket)
 	player.falseKey = [];
 	player.image = 11;
 	player.id = socket.id;
+	player.online = false;
 
 	socket.on('login', function (login, id)
 	{
 		player.login = login;
+		player.online = true;
 		if (playerList.length == 0)
 		{
 			player.admin = true;
 			socket.emit('admin');
+			socket.join('roomadmin');
 		}
+		else
+			socket.join('roomplayer');
 		playerList.push(player);
 		socket.emit("login", player.login, player.id);
 		/*
@@ -103,12 +108,8 @@ io.on('connection', function(socket)
 					i++;
 				}
 				setWord(secretWord);
-				io.emit("start", secretWord);
-				socket.to('roomadmin').emit("adminView", generatePlayerList(false));
-				socket.join('roomadmin');
-			}
-			else {
-				socket.join('roomplayer');
+				io.emit("start", secretWord, generateList());
+				socket.to('roomadmin').emit("updatePlayers", generatePlayerList(false));
 			}
 		});
 		socket.on('key', function(key)
@@ -140,14 +141,14 @@ io.on('connection', function(socket)
 					io.emit("loose", player.id);
 				}
 			}
-			socket.emit('updatePlayer', generatePlayer(player, true));
-			io.broadcast('roomplayer').emit('publicView', generatePlayerList(true));
-			socket.to('roomadmin').emit("adminView", generatePlayerList(false));
+			socket.emit('updatePlayer', generatePlayer(player, false));
+			socket.broadcast.to('roomplayer').emit('updatePlayer', generatePlayer(player, true));
+			io.to('roomadmin').emit("updatePlayer", generatePlayer(player, false));
 		});
 	});
 	socket.on('disconnect', function()
 	{
-		player.out = true;
+		player.online = false;
 		console.log('disconnect event');
 		io.emit("playerList", generateList());
 	});

@@ -6,8 +6,8 @@ var id;
 function manageSelfLogin(realLogin, realId)
 {
 	login = realLogin;
-	realId = id;
-	alert("Bonjour "+login+" !");
+	id = realId;
+	alert("Bonjour "+login+" ! ("+id+")");
 	socket.removeListener('login', manageSelfLogin);
 }
 
@@ -54,8 +54,9 @@ function update(info)
 	}
 }
 
-function displayGame(word)
+function displayGame(word, playerList)
 {
+	managePlayerList(playerList);
 	$('.block').hide();
 	$('#game').show();
 	$('#self').find('.word').html(word);
