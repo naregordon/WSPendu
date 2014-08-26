@@ -61,18 +61,6 @@ function setWord(newWord)
 	}
 }
 
-function usedKey (key, player) 
-{
-	var i = 0;
-	while (i < player.length)
-	{
-		if (key === player[i])
-			return true;
-		else
-			return false;
-	}
-}
-
 io.on('connection', function(socket)
 {
 	console.log("new");
@@ -127,7 +115,7 @@ io.on('connection', function(socket)
 		if(player.admin != true) {
 			socket.on('key', function(key)
 			{
-				if (usedKey(key, player.used) != true)
+				if (player.used.indexOf(key) != -1)
 				{	
 					player.used.push(key);
 					var curPos = 0;
