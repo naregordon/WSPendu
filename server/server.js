@@ -96,6 +96,24 @@ io.on('connection', function(socket)
 	
 		socket.on('word', function(word)
 		{
+			(function timer(interval)
+			{
+				var interval = 5;
+				if() 
+				{
+				timer = setInterval(function ()
+					{
+						io.emit('timer', interval);
+						interval--;
+						console.log(interval);
+					}, 1000);
+				}			
+				else
+				{
+					clearInterval(timer);
+				}
+			})();
+
 			if (player.admin == true)
 			{
 				currentWord = word;
