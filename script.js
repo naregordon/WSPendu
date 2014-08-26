@@ -2,6 +2,7 @@ var socket;
 var list;
 var login;
 var id;
+var admin = false;
 
 function manageSelfLogin(realLogin, realId)
 {
@@ -13,6 +14,7 @@ function manageSelfLogin(realLogin, realId)
 
 function displayRoom()
 {
+	admin = false;
 	$('.block,#start').hide();
 	$('#room').show();
 	socket.on("admin", displayStartButton);
@@ -22,6 +24,7 @@ function displayRoom()
 
 function displayStartButton()
 {
+	admin = true;
 	$('#start').show();
 	$('#start').one('click', function()
 	{
@@ -35,7 +38,8 @@ function displayStartButton()
 
 function update(info)
 {
-	console.log(info);
+	if (info.admin == true)
+		return;
 	if ($('#j_'+info.id).length > 0)
 	{
 		$('.img', $('#j_'+info.id)).attr('class', "imgstatus"+(12 - info.image)).addClass('img');
@@ -49,7 +53,13 @@ function update(info)
 		$(div).append('<div class="word">'+info.word+'</div>');
 		$(div).append('<div class="used">'+info.used+'</div>');
 		if (info.id == id)
-			$('#self').html(div);
+		{
+			if (admin == false)
+			{
+				$('#self').show();
+				$('#self').html(div);
+			}
+		}
 		else
 			$('#other').append(div);
 	}
@@ -66,9 +76,15 @@ function displayGame(word, playerList, timer)
 	managePlayerList(playerList);
 	$('.block').hide();
 	$('#game').show();
-	$('#self').find('.word').html(word);
-	$('#self').find('.used').empty();
-	$('#self').find('.img').attr('class', "imgstatus11").addClass('img');
+	if (admin == false)
+	{
+		$('#self').show();
+		$('#self').find('.word').html(word);
+		$('#self').find('.used').empty();
+		$('#self').find('.img').attr('class', "imgstatus11").addClass('img');
+	}
+	else
+		$('#self').hide();
 	$('body').off('keydown').on('keydown', sendKey);
 	var i = 0;
 	while (list[i] != undefined)
@@ -140,8 +156,8 @@ function sendKey(info)
 
 $(document).ready(function()
 {
-	socket = io('localhost:8888');
-	//socket = io('192.168.1.93:8888');
+	//socket = io('localhost:8888');
+	socket = io('192.168.1.100:8888');
 	displayRoom();
 	socket.on("playerList", managePlayerList);
 	socket.on("updatePlayers", managePlayers);
