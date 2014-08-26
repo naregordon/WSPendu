@@ -51,3 +51,51 @@ h1 {
 	height: 200px;
 	float: left;
 }
+
+.img{
+	background: url('../images/pendu.jpg') no-repeat 5px 5px;
+}
+
+.imgstatus1 {
+	background-position: -300px -1045px;
+}
+.imgstatus2 {
+	background-position: 0px -1045px;
+}
+
+.imgstatus3 {
+	background-position: -515px -720px;
+}
+
+.imgstatus4 {
+	background-position: -270px -720px;
+}
+
+.imgstatus5 {
+	background-position: 0px -720px;
+}
+
+.imgstatus6 {
+	background-position: -515px -385px;
+}
+
+.imgstatus7 {
+	background-position: -270px -385px;
+}
+
+.imgstatus8 {
+	background-position: 0px -385px;
+}
+
+.imgstatus9{
+	background-position: -515px -50px;
+}
+
+.imgstatus10 {
+	background-position: -270px -50px;
+}
+
+.imgstatus11 {
+	background-position: 0px -50px;
+}
+
