@@ -61,6 +61,18 @@ function setWord(newWord)
 	}
 }
 
+function usedKey (key, player) 
+{
+	var i = 0;
+	while (i < player.length)
+	{
+		if (key === player[i])
+			return true;
+		else
+			return false;
+	}
+}
+
 io.on('connection', function(socket)
 {
 	console.log("new");
@@ -112,39 +124,46 @@ io.on('connection', function(socket)
 				socket.to('roomadmin').emit("updatePlayers", generatePlayerList(false));
 			}
 		});
-		socket.on('key', function(key)
-		{
-			player.used.push(key);
-			var curPos = 0;
-			var pos = 0;
-			var wrong = true;
-			while ((pos = currentWord.toLowerCase().indexOf(key.toLowerCase(), curPos)) != -1)
+		if(player.admin != true) {
+			socket.on('key', function(key)
 			{
-				console.log("BEFORE > ", player.word, curPos, pos);
-				player.word = player.word.substr(0, pos)+key+player.word.substr(pos+1);
-				player.publicWord = player.publicWord.substr(0, pos)+'X'+player.publicWord.substr(pos+1);
-				wrong = false;
-				curPos = pos + 1;
-				console.log("AFTER > ", player.word);
-				console.log(key);
-				console.log(curPos);
-				console.log("DEBUG > ", currentWord.charAt(curPos));
-				console.log(currentWord);
-				if (player.word.toLowerCase() === currentWord.toLowerCase()) {
-					io.emit("winner", generatePlayer(player, true));
+				if (usedKey(key, player.used) != true)
+				{	
+					player.used.push(key);
+					var curPos = 0;
+					var pos = 0;
+					var wrong = true;
+					while ((pos = currentWord.toLowerCase().indexOf(key.toLowerCase(), curPos)) != -1)
+					{
+						console.log("BEFORE > ", player.word, curPos, pos);
+						player.word = player.word.substr(0, pos)+key+player.word.substr(pos+1);
+						player.publicWord = player.publicWord.substr(0, pos)+'X'+player.publicWord.substr(pos+1);
+						wrong = false;
+						curPos = pos + 1;
+						console.log("AFTER > ", player.word);
+						console.log(key);
+						console.log(curPos);
+						console.log("DEBUG > ", currentWord.charAt(curPos));
+						console.log(currentWord);
+						if (player.word.toLowerCase() === currentWord.toLowerCase()) {
+							io.emit("winner", generatePlayer(player, true));
+						}
+					}
+					if (wrong) {
+						player.falseKey.push(key);
+						player.image--;
+						if(player.image <= 0) {
+							io.emit("loose", player.id);
+						}
+					}
+					socket.emit('updatePlayer', generatePlayer(player, false));
+					socket.broadcast.to('roomplayer').emit('updatePlayer', generatePlayer(player, true));
+					io.to('roomadmin').emit("updatePlayer", generatePlayer(player, false));
 				}
-			}
-			if (wrong) {
-				player.falseKey.push(key);
-				player.image--;
-				if(player.image <= 0) {
-					io.emit("loose", player.id);
-				}
-			}
-			socket.emit('updatePlayer', generatePlayer(player, false));
-			socket.broadcast.to('roomplayer').emit('updatePlayer', generatePlayer(player, true));
-			io.to('roomadmin').emit("updatePlayer", generatePlayer(player, false));
-		});
+				else
+					console.log('coucou');
+			});
+		};
 	});
 	socket.on('disconnect', function()
 	{
