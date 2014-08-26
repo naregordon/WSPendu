@@ -54,8 +54,14 @@ function update(info)
 	}
 }
 
-function displayGame(word, playerList)
+function updateTimer(timer)
 {
+	$('#clock').html(timer);
+}
+
+function displayGame(word, playerList, timer)
+{
+	$('#clock').html(timer);
 	managePlayerList(playerList);
 	$('.block').hide();
 	$('#game').show();
@@ -70,15 +76,30 @@ function displayGame(word, playerList)
 		i++;
 	}
 	socket.on("updatePlayer", update);
+	socket.on("timer", updateTimer);
 	socket.removeListener('start', displayGame);
 	socket.removeListener('admin', displayStartButton);
+	socket.on("loose", displayFinish);
+	socket.on("winner", displayFinish);
 }
 
-function displayFinish()
+function displayFinish(data)
 {
-	$('body').off('keydown');
-	$('.block').hide();
-	$('#finish').show();
+	if (typeof data == "object")
+	{
+		socket.removeListener('updatePlayer', update);
+		socket.removeListener('loose', displayFinish);
+		socket.removeListener('winner', displayFinish);
+		socket.removeListener('timer', updateTimer);
+		$('body').off('keydown');
+		$('.block').hide();
+		$('#finish').show();
+		$('#winner').html(data.login+' ('+data.score+')');
+	}
+	else
+	{
+		alert('CE GROS NOOB IL A PERDU : '+data);
+	}
 }
 
 function managePlayerList(playerList)
@@ -89,9 +110,9 @@ function managePlayerList(playerList)
 	while(list[i] != undefined)
 	{
 		if (list[i].admin == true)
-			$("#list").append('<h2 style="background-color:red;">'+list[i]['login']+"</h2>");
+			$("#list").append('<h2 style="background-color:red;">'+list[i]['login']+" ("+list[i].score+")</h2>");
 		else
-			$("#list").append("<h2>"+list[i]['login']+"</h2>");
+			$("#list").append("<h2>"+list[i]['login']+"("+list[i].score+")</h2>");
 		i++;
 	}
 }
@@ -109,8 +130,6 @@ $(document).ready(function()
 	displayRoom();
 	socket.on("playerList", managePlayerList);
 	socket.on("login", manageSelfLogin);
-	socket.on("loose", function(id){alert('loose'+id)});
-	socket.on("winner", function(id){alert('win'+id.login)});
 	login = prompt('What is your nickname ? :)');
 	socket.emit("login", login);
 });
