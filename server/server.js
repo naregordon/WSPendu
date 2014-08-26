@@ -51,6 +51,7 @@ function setWord(newWord)
 	var i = 0;
 	while (playerList[i] != undefined)
 	{
+		playerList[i].loose = false;
 		playerList[i].word = newWord;
 		playerList[i].publicWord = newWord;
 		i++;
@@ -153,60 +154,64 @@ io.on('connection', function(socket)
 		{
 			socket.on('key', function(key)
 			{
-				if (player.used.indexOf(key) == -1)
+				if (player.loose == false)
 				{
-					player.used.push(key);
-					var curPos = 0;
-					var pos = 0;
-					var wrong = true;
-					while ((pos = currentWord.toLowerCase().indexOf(key.toLowerCase(), curPos)) != -1)
+					if (player.used.indexOf(key) == -1)
 					{
-						player.word = player.word.substr(0, pos)+key+player.word.substr(pos+1);
-						player.publicWord = player.publicWord.substr(0, pos)+'X'+player.publicWord.substr(pos+1);
-						wrong = false;
-						curPos = pos + 1;
-						player.score += 2;
-						if (player.word.toLowerCase() === currentWord.toLowerCase())
+						player.used.push(key);
+						var curPos = 0;
+						var pos = 0;
+						var wrong = true;
+						while ((pos = currentWord.toLowerCase().indexOf(key.toLowerCase(), curPos)) != -1)
 						{
-							player.score += 2 * currentWord.length;
-							io.emit("winner", generatePlayer(player, true));
-							setTimeout(function()
+							player.word = player.word.substr(0, pos)+key+player.word.substr(pos+1);
+							player.publicWord = player.publicWord.substr(0, pos)+'X'+player.publicWord.substr(pos+1);
+							wrong = false;
+							curPos = pos + 1;
+							player.score += 2;
+							if (player.word.toLowerCase() === currentWord.toLowerCase())
 							{
-								io.emit('reset');
-								var k = 0;
-								while (playerList[k] != undefined)
-								{
-									if (playerList[k].admin == true)
-									{
-										playerList[k].admin = false;
-										playerList[k].socket.leave('roomadmin');
-										playerList[k].socket.join('roomplayer');
-									}
-									k++;
-								}
-								player.admin = true;
-								player.socket.leave('roomplayer');
-								player.socket.join('roomadmin');
+								player.score += 2 * currentWord.length;
+								io.emit("winner", generatePlayer(player, true));
 								setTimeout(function()
 								{
-									io.emit("updatePlayers", generatePlayerList(true));
-									socket.emit('admin');
-								}, 1000);
-							}, 5000);
-							clearInterval(interv);
+									io.emit('reset');
+									var k = 0;
+									while (playerList[k] != undefined)
+									{
+										if (playerList[k].admin == true)
+										{
+											playerList[k].admin = false;
+											playerList[k].socket.leave('roomadmin');
+											playerList[k].socket.join('roomplayer');
+										}
+										k++;
+									}
+									player.admin = true;
+									player.socket.leave('roomplayer');
+									player.socket.join('roomadmin');
+									setTimeout(function()
+									{
+										io.emit("updatePlayers", generatePlayerList(true));
+										socket.emit('admin');
+									}, 1000);
+								}, 5000);
+								clearInterval(interv);
+							}
 						}
-					}
-					if (wrong) {
-						player.falseKey.push(key);
-						player.image++;
-						player.score--;
-						if(player.image == 11) {
-							io.emit("loose", player.id);
+						if (wrong) {
+							player.falseKey.push(key);
+							player.image++;
+							player.score--;
+							if(player.image == 11) {
+								player.loose = true;
+								io.emit("loose", player.id);
+							}
 						}
+						socket.emit('updatePlayer', generatePlayer(player, false));
+						socket.broadcast.to('roomplayer').emit('updatePlayer', generatePlayer(player, true));
+						io.to('roomadmin').emit("updatePlayer", generatePlayer(player, false));
 					}
-					socket.emit('updatePlayer', generatePlayer(player, false));
-					socket.broadcast.to('roomplayer').emit('updatePlayer', generatePlayer(player, true));
-					io.to('roomadmin').emit("updatePlayer", generatePlayer(player, false));
 				}
 			});
 		};
