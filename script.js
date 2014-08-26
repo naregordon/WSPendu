@@ -17,6 +17,7 @@ function displayRoom()
 	$('#room').show();
 	socket.on("admin", displayStartButton);
 	socket.on("start", displayGame);
+	socket.removeListener('reset', displayRoom);
 }
 
 function displayStartButton()
@@ -95,6 +96,7 @@ function displayFinish(data)
 		$('.block').hide();
 		$('#finish').show();
 		$('#winner').html(data.login+' ('+data.score+')');
+		socket.on("reset", displayRoom);
 	}
 	else
 	{
@@ -105,6 +107,21 @@ function displayFinish(data)
 function managePlayerList(playerList)
 {
 	list = playerList;
+	var i = 0;
+	$("#list").empty();
+	while(list[i] != undefined)
+	{
+		if (list[i].admin == true)
+			$("#list").append('<h2 style="background-color:red;">'+list[i]['login']+" ("+list[i].score+")</h2>");
+		else
+			$("#list").append("<h2>"+list[i]['login']+"("+list[i].score+")</h2>");
+		i++;
+	}
+}
+
+function managePlayers(tab)
+{
+	list = tab;
 	var i = 0;
 	$("#list").empty();
 	while(list[i] != undefined)
@@ -129,6 +146,7 @@ $(document).ready(function()
 	//socket = io('192.168.1.93:8888');
 	displayRoom();
 	socket.on("playerList", managePlayerList);
+	socket.on("updatePlayers", managePlayers);
 	socket.on("login", manageSelfLogin);
 	login = prompt('What is your nickname ? :)');
 	socket.emit("login", login);

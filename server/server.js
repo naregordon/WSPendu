@@ -1,6 +1,7 @@
 var io = require('socket.io').listen(8888);
 var playerList = new Array();
 var currentWord;
+var interv;
 
 function generateList()
 {
@@ -42,7 +43,6 @@ function generatePlayer(data, isPublic)
 		tab.word = data['word'];// _ A _ B _ U
 		tab.used = data['falseKey'];
 	}
-	console.log(tab);
 	return tab;
 }
 
@@ -57,10 +57,8 @@ function setWord(newWord)
 	}
 }
 
-io.on('connection', function(socket)
+function createPlayer(socket)
 {
-	console.log("new");
-
 	var player = {};
 	player.socket = socket;
 	player.score = 0;
@@ -70,46 +68,50 @@ io.on('connection', function(socket)
 	player.image = 1;
 	player.id = socket.id;
 	player.online = false;
+	return player;
+}
+
+io.on('connection', function(socket)
+{
+	var player = createPlayer(socket);
+	console.log("New player > ", player.id);
 
 	socket.on('login', function (login, id)
 	{
 		player.login = login;
 		player.online = true;
-		if (playerList.length == 0)
+		playerList.push(player);
+		var l = 0;
+		var bool = false;
+		while (playerList[l] != undefined)
 		{
-			player.admin = true;
-			socket.emit('admin');
-			socket.join('roomadmin');
+			if (playerList[l].admin == true && playerList[l].online == true)
+				bool = true;
+			l++;
+		}
+		console.log("admin > ", bool);
+		if (bool == false)
+		{
+			var m = 0;
+			while (playerList[m] != undefined && playerList[m].online != true)
+				m++;
+			console.log(playerList[m].login);
+			if (playerList[m] != undefined)
+			{
+				playerList[m].admin = true;
+				playerList[m].socket.join('roomadmin');
+				playerList[m].socket.leave('roomplayer');
+				playerList[m].socket.emit('admin');
+			}
 		}
 		else
 			socket.join('roomplayer');
-		playerList.push(player);
 		socket.emit("login", player.login, player.id);
-		/*
-			
-		*/
+
 		io.emit("playerList", generateList());
-	
+
 		socket.on('word', function(word)
 		{
-			(function timer(interval)
-			{
-				var interval = 5;
-				if() 
-				{
-				timer = setInterval(function ()
-					{
-						io.emit('timer', interval);
-						interval--;
-						console.log(interval);
-					}, 1000);
-				}			
-				else
-				{
-					clearInterval(timer);
-				}
-			})();
-
 			if (player.admin == true)
 			{
 				currentWord = word;
@@ -121,12 +123,34 @@ io.on('connection', function(socket)
 					secretWord += "_";
 					i++;
 				}
+				var timer = 30;
 				setWord(secretWord);
-				io.emit("start", secretWord, generateList(), 30);
+				io.emit("start", secretWord, generateList(), timer);
 				socket.to('roomadmin').emit("updatePlayers", generatePlayerList(false));
+				interv = setInterval(function()
+				{
+					io.emit('timer', timer);
+					timer--;
+					if (timer <= -1)
+					{
+						player.score += 2 * currentWord.length;
+						io.emit('winner', generatePlayer(player, true));
+						clearInterval(interv);
+						setTimeout(function()
+						{
+							io.emit('reset');
+							io.emit("updatePlayers", generatePlayerList(true));
+							setTimeout(function()
+							{
+								socket.emit('admin');
+							}, 1000);
+						}, 5000);
+					}
+				}, 1000);
 			}
 		});
-		if(player.admin != true) {
+		if(player.admin != true)
+		{
 			socket.on('key', function(key)
 			{
 				if (player.used.indexOf(key) == -1)
@@ -137,19 +161,39 @@ io.on('connection', function(socket)
 					var wrong = true;
 					while ((pos = currentWord.toLowerCase().indexOf(key.toLowerCase(), curPos)) != -1)
 					{
-						console.log("BEFORE > ", player.word, curPos, pos);
 						player.word = player.word.substr(0, pos)+key+player.word.substr(pos+1);
 						player.publicWord = player.publicWord.substr(0, pos)+'X'+player.publicWord.substr(pos+1);
 						wrong = false;
 						curPos = pos + 1;
 						player.score += 2;
-						console.log("AFTER > ", player.word);
-						console.log(key);
-						console.log(curPos);
-						console.log("DEBUG > ", currentWord.charAt(curPos));
-						console.log(currentWord);
-						if (player.word.toLowerCase() === currentWord.toLowerCase()) {
+						if (player.word.toLowerCase() === currentWord.toLowerCase())
+						{
+							player.score += 2 * currentWord.length;
 							io.emit("winner", generatePlayer(player, true));
+							setTimeout(function()
+							{
+								io.emit('reset');
+								var k = 0;
+								while (playerList[k] != undefined)
+								{
+									if (playerList[k].admin == true)
+									{
+										playerList[k].admin = false;
+										playerList[k].socket.leave('roomadmin');
+										playerList[k].socket.join('roomplayer');
+									}
+									k++;
+								}
+								player.admin = true;
+								player.socket.leave('roomplayer');
+								player.socket.join('roomadmin');
+								setTimeout(function()
+								{
+									io.emit("updatePlayers", generatePlayerList(true));
+									socket.emit('admin');
+								}, 1000);
+							}, 5000);
+							clearInterval(interv);
 						}
 					}
 					if (wrong) {
@@ -170,7 +214,7 @@ io.on('connection', function(socket)
 	socket.on('disconnect', function()
 	{
 		player.online = false;
-		console.log('disconnect event');
+		console.log('Player disconnected > ', player.id);
 		io.emit("playerList", generateList());
 	});
 });
