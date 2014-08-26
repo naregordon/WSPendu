@@ -38,14 +38,14 @@ function update(info)
 	console.log(info);
 	if ($('#j_'+info.id).length > 0)
 	{
-		$('.img', $('#j_'+info.id)).attr('src', 'images/pendu.jpg');
+		$('.img', $('#j_'+info.id)).attr('class', "imgstatus"+(12 - info.image)).addClass('img');
 		$('.word', $('#j_'+info.id)).html(info.word);
 		$('.used', $('#j_'+info.id)).html(info.used);
 	}
 	else
 	{
 		var div = $('<fieldset id="j_'+info.id+'"><legend>'+info.login+'</legend></fieldset>');
-		$(div).append('<img class="img" src="images/pendu.jpg"/>');
+		$(div).append('<div class="img imgstatus'+(12 - info.image)+'"></div>');
 		$(div).append('<div class="word">'+info.word+'</div>');
 		$(div).append('<div class="used">'+info.used+'</div>');
 		if (info.id == id)
@@ -68,7 +68,7 @@ function displayGame(word, playerList, timer)
 	$('#game').show();
 	$('#self').find('.word').html(word);
 	$('#self').find('.used').empty();
-	$('#self').find('.img').attr('src', "images/pendu.jpg");
+	$('#self').find('.img').attr('class', "imgstatus11").addClass('img');
 	$('body').off('keydown').on('keydown', sendKey);
 	var i = 0;
 	while (list[i] != undefined)
@@ -99,9 +99,7 @@ function displayFinish(data)
 		socket.on("reset", displayRoom);
 	}
 	else
-	{
-		alert('CE GROS NOOB IL A PERDU : '+data);
-	}
+		$('#j_'+data).css('background-color', 'red');
 }
 
 function managePlayerList(playerList)
