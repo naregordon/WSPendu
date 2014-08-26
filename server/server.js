@@ -18,17 +18,25 @@ function generateList()
 function generatePlayer(data, isPublic)
 {
 	var tab = {};
+	tab.id = data['id'];
 	tab.login = data['login'];
-	tab.score = data['score'];
 	tab.admin = data['admin'];
-	tab.word = data['word'];// _ A _ B _ U
+
+	if(isPublic === true) {
+	tab.score = data['score'];
 	tab.publicWord = data['publicWord'];// _ X _ X _ X
+	tab.publicUsed = data['used'].length;
+	tab.image = data['image'];
+	}
+	else {
+	tab.word = data['word'];// _ A _ B _ U
+	tab.currentWord = data['currentWord'];
+	tab.falseKey = data['falseKey'];
 	tab.used = data['used'];
 	tab.publicUsed = data['used'].length;
 	tab.image = data['image'];
-	tab.falseKey = data['falseKey'];
-	tab.currentWord = data['currentWord'];
-	tab.id = data['id'];
+	tab.score = data['score'];
+	}
 	return tab;
 }
 
@@ -91,6 +99,7 @@ io.on('connection', function(socket)
 				}
 				setWord(secretWord);
 				io.emit("start", secretWord);
+				socket.emit("adminView", generatePlayer(playerList, false));
 			}
 		});
 		socket.on('key', function(key)
