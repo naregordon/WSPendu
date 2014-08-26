@@ -104,7 +104,11 @@ io.on('connection', function(socket)
 				}
 				setWord(secretWord);
 				io.emit("start", secretWord);
-				socket.emit("adminView", generatePlayerList(false));
+				socket.to('roomadmin').emit("adminView", generatePlayerList(false));
+				socket.join('roomadmin');
+			}
+			else {
+				socket.join('roomplayer');
 			}
 		});
 		socket.on('key', function(key)
@@ -137,6 +141,8 @@ io.on('connection', function(socket)
 				}
 			}
 			socket.emit('updatePlayer', generatePlayer(player, true));
+			io.broadcast('roomplayer').emit('publicView', generatePlayerList(true));
+			socket.to('roomadmin').emit("adminView", generatePlayerList(false));
 		});
 	});
 	socket.on('disconnect', function()
