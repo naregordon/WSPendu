@@ -42,12 +42,8 @@ function generatePlayer(data, isPublic)
 		tab.word = data['word'];// _ A _ B _ U
 		tab.used = data['falseKey'];
 	}
+	console.log(tab);
 	return tab;
-}
-
-function refreshPlayer(id)
-{
-	io.emit("status", generatePlayer(playerList[id]));
 }
 
 function setWord(newWord)
@@ -126,7 +122,7 @@ io.on('connection', function(socket)
 					i++;
 				}
 				setWord(secretWord);
-				io.emit("start", secretWord, generateList());
+				io.emit("start", secretWord, generateList(), 30);
 				socket.to('roomadmin').emit("updatePlayers", generatePlayerList(false));
 			}
 		});
@@ -134,7 +130,7 @@ io.on('connection', function(socket)
 			socket.on('key', function(key)
 			{
 				if (player.used.indexOf(key) == -1)
-				{	
+				{
 					player.used.push(key);
 					var curPos = 0;
 					var pos = 0;
