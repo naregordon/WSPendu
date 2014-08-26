@@ -15,11 +15,11 @@ function generateList()
 	return tab;
 }
 
-function generatePlayerList() {
+function generatePlayerList(isPublic) {
 	var tab = new Array();
 	var i = 0;
 	while(playerList[i] != undefined) {
-		tab.push(generatePlayer(player[i], false));
+		tab.push(generatePlayer(player[i], isPublic));
 		i++;
 	}
 	return tab;
@@ -104,7 +104,7 @@ io.on('connection', function(socket)
 				}
 				setWord(secretWord);
 				io.emit("start", secretWord);
-				socket.emit("adminView", generatePlayer(generatePlayerList, false));
+				socket.emit("adminView", generatePlayerList(false));
 			}
 		});
 		socket.on('key', function(key)
