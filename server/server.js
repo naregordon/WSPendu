@@ -21,21 +21,16 @@ function generatePlayer(data, isPublic)
 	tab.id = data['id'];
 	tab.login = data['login'];
 	tab.admin = data['admin'];
+	tab.score = data['score'];
+	tab.image = data['image'];
 
 	if(isPublic === true) {
-	tab.score = data['score'];
-	tab.publicWord = data['publicWord'];// _ X _ X _ X
-	tab.publicUsed = data['used'].length;
-	tab.image = data['image'];
+		tab.word = data['publicWord'];// _ X _ X _ X
+		tab.used = data['used'].length;
 	}
 	else {
-	tab.word = data['word'];// _ A _ B _ U
-	tab.currentWord = data['currentWord'];
-	tab.falseKey = data['falseKey'];
-	tab.used = data['used'];
-	tab.publicUsed = data['used'].length;
-	tab.image = data['image'];
-	tab.score = data['score'];
+		tab.word = data['word'];// _ A _ B _ U
+		tab.used = data['falseKey'];
 	}
 	return tab;
 }
