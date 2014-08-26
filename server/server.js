@@ -69,9 +69,9 @@ io.on('connection', function(socket)
 	player.socket = socket;
 	player.score = 0;
 	player.admin = false;
-	player.used = [];
+	player.used = new Array();
 	player.falseKey = [];
-	player.image = 11;
+	player.image = 1;
 	player.id = socket.id;
 	player.online = false;
 
@@ -115,7 +115,7 @@ io.on('connection', function(socket)
 		if(player.admin != true) {
 			socket.on('key', function(key)
 			{
-				if (player.used.indexOf(key) != -1)
+				if (player.used.indexOf(key) == -1)
 				{	
 					player.used.push(key);
 					var curPos = 0;
@@ -128,6 +128,7 @@ io.on('connection', function(socket)
 						player.publicWord = player.publicWord.substr(0, pos)+'X'+player.publicWord.substr(pos+1);
 						wrong = false;
 						curPos = pos + 1;
+						player.score += 2;
 						console.log("AFTER > ", player.word);
 						console.log(key);
 						console.log(curPos);
@@ -139,8 +140,9 @@ io.on('connection', function(socket)
 					}
 					if (wrong) {
 						player.falseKey.push(key);
-						player.image--;
-						if(player.image <= 0) {
+						player.image++;
+						player.score--;
+						if(player.image == 11) {
 							io.emit("loose", player.id);
 						}
 					}
@@ -148,8 +150,6 @@ io.on('connection', function(socket)
 					socket.broadcast.to('roomplayer').emit('updatePlayer', generatePlayer(player, true));
 					io.to('roomadmin').emit("updatePlayer", generatePlayer(player, false));
 				}
-				else
-					console.log('coucou');
 			});
 		};
 	});
